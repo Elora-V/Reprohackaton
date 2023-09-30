@@ -1,0 +1,15 @@
+
+    Staphylococcus Persistence Profiling Pipeline.
+
+    [HOMEPAGE & DOCUMENTATION]: https://gitlab.dsi.universite-paris-saclay.fr/fiona.hak/reprohackathon
+    [AUTHORS]: Celine Guo, Shun Robert, Elora Vigo, Fiona Hak
+    [VERSION]: 1.0.0
+    [LICENSE]: Apache License, Version 2.0
+    [RUN S3P]: conda activate nextflow & nextflow main.nf <options>
+
+    [OPTIONS & PARAMETER]:
+
+    ##MAIN ARGUMENTS
+
+    ##OTHER
+    --help                                            Display this message.
