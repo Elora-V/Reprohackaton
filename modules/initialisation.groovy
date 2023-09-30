@@ -17,11 +17,8 @@ process initializeFolders {
     when:
         !params.help
     exec:
-        //Fastq folders
         file("$results/FASTQ/RAW").mkdirs()
         file("$results/FASTQ/FILTERED").mkdirs()
-
-        params.initializeFolders = true
 }
 
 workflow initialisation {
