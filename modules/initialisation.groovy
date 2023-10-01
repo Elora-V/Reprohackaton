@@ -3,6 +3,7 @@
 nextflow.enable.dsl=2
 
 process help {
+    label 'linux'
     input:
         val errorMessage
     when:
@@ -12,6 +13,7 @@ process help {
 }
 
 process initializeFolders {
+    label 'linux'
     input:
         val results
     when:
@@ -21,6 +23,7 @@ process initializeFolders {
         file("$results/FASTQ/FILTERED").mkdirs()
         file("$results/BAM").mkdirs()
         file("$results/REFERENCE_FILES").mkdirs()
+        file("$results/COUNTING").mkdirs()
 }
 
 workflow initialisation {

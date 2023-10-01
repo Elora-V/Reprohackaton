@@ -14,7 +14,7 @@ process download_NCBI {
     script:
     """
         prefetch $run 
-        fasterq-dump $run --skip-technical
+        fasterq-dump $run --skip-technical --threads "${params.threads_download}"
 
         pigz ${run}.fastq --best
     
@@ -26,6 +26,7 @@ process download_NCBI {
 }
 
 process download_reference_genome {
+    label 'linux'
     input:
         val(results)
     output:
@@ -40,6 +41,7 @@ process download_reference_genome {
 }
 
 process download_reference_annotation {
+    label 'linux'
     input:
         val(results)
     output:
@@ -66,4 +68,5 @@ workflow download {
     emit:
         fastq_files=download_NCBI.out
         ref=download_reference_genome.out
+        annot=download_reference_annotation.out
 }

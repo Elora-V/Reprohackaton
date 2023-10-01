@@ -12,8 +12,14 @@
     ##MAIN ARGUMENTS
     #DATA
     --sra [PATH/TO/CONFIG/FILE]                       <default = "bin/sra.txt> Configuration file: must contain one accession number per line. These accessions will be downloaded from the NCBI. By default the pipeline takes as input the six SRAs of the project article stored in a sra.txt file in the bin folder.
-    --reference_genome [DOWNLOAD.URL]                 <defaut = "none"> Takes a download URL as a parameter. This option is mandatory to run the mapping (if it is not specified, the pipeline will automatically stop at trimming level).
-    --reference_annotation [DOWNLOAD.URL]             <defaut = "none"> Takes a download URL as a parameter. This option is mandatory to run the counting step (if it is not specified, the pipeline will automatically stop at mapping level).
+    --reference_genome [DOWNLOAD.URL]                 <default = "none"> Takes a download URL as a parameter. This option is mandatory to run the mapping (if it is not specified, the pipeline will automatically stop at trimming level).
+    --reference_annotation [DOWNLOAD.URL]             <default = "none"> Takes a download URL as a parameter. This option is mandatory to run the counting step (if it is not specified, the pipeline will automatically stop at mapping level).
+
+    #THREADS CONFIGURATION
+    --threads_download [int]                          <default = 4> Number of cpu allocated to download the data.
+	--threads_mapping [int]                           <default = 8> Number of cpu allocated to the mapping.
+	--threads_sort_bam [int]                          <default = 4> Number of cpu allocated to sort the alignment files.
+	--threads_counting [int]                          <default = 4> Number of cpu allocated to the counting reads step.
 
     ##OTHER
     --help                                            Display this message.

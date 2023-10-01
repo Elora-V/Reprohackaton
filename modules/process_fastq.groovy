@@ -10,7 +10,7 @@ process trim_single_end {
     output:
         tuple val(run), file("${run}_trimmed.fq.gz")
     when:
-        !params.help && !mf.checkFile("$results/FASTQ/FILTERED", run, "q.gz")
+        !params.help && !mf.checkFile("$results/FASTQ/FILTERED", run, "q.gz") && mf.checkFile("$results/FASTQ/RAW", run, "q.gz")
     script:
         """
         trim_galore -q 20 --phred33 --gzip --length 25 -o $results/FASTQ/FILTERED "${run}.fastq.gz"
@@ -42,12 +42,12 @@ process mapping_bowtie {
         val(results)
         val index
     output:
-        tuple val(run), file("${run}.bam")
+        file("${run}.bam")
     when:
-        !params.help && !mf.checkFile("$results/BAM", run, "bam")
+        !params.help && !mf.checkFile("$results/BAM", run, "bam") && mf.checkFile("$results/REFERENCE_FILES", "reference", "fasta") && mf.checkFile("$results/FASTQ/FILTERED", run, "q.gz")
     script:
         """
-        bowtie -p 8 -S $results/BAM/$index <(gunzip -c "${run}_trimmed.fq.gz") | samtools sort -@ 8 > "$results/BAM/${run}.bam"
+        bowtie -p "${params.threads_mapping}" -S $results/BAM/$index <(gunzip -c "${run}_trimmed.fq.gz") | samtools sort -@ "${params.threads_sort_bam}" > "$results/BAM/${run}.bam"
         samtools index "$results/BAM/${run}.bam"
         ln -s $results/BAM/${run}.bam ${run}.bam
         """
@@ -58,10 +58,13 @@ mf = new functions()
 workflow process_fastq {
     take: fastq_files
     take: ref_genome
+    take: annot_genome
 
     main:
         results = file(params.results)
         trim_single_end(fastq_files, results)
         index_bowtie(ref_genome, results, "index_mapping")
         mapping_bowtie(trim_single_end.out, results, "index_mapping")
+    emit:
+        all_bam_files=mapping_bowtie.out.collect()
 }
