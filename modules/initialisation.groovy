@@ -19,13 +19,15 @@ process initializeFolders {
     exec:
         file("$results/FASTQ/RAW").mkdirs()
         file("$results/FASTQ/FILTERED").mkdirs()
+        file("$results/BAM").mkdirs()
+        file("$results/REFERENCE_FILES").mkdirs()
 }
 
 workflow initialisation {
     main:
-    results = file(params.results)
+        results = file(params.results)
 
-    errorMessage = file("./bin/help.txt")
-    help(errorMessage)
-    initializeFolders(results)
+        errorMessage = file("./bin/help.txt")
+        help(errorMessage)
+        initializeFolders(results)
 }

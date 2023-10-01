@@ -25,12 +25,12 @@ nextflow.enable.dsl=2
 // sub-workflow import
 include { initialisation }	from		'./modules/initialisation.groovy'
 include { download }	from		'./modules/download.groovy'
-include { clean_fastq }	from		'./modules/clean_fastq.groovy'
+include { process_fastq }	from		'./modules/process_fastq.groovy'
 
 workflow {
     main:
         initialisation()
         download()
-        clean_fastq(download.out)
+        process_fastq(download.out)
 }
 

@@ -29,11 +29,16 @@ Pour plus d'information sur les options disponible :
 
     nextflow main.nf --help
 
-*EXÉCUTABLE A CRÉER*
+Lancement de l'executable pour le projet :
+
+    nextflow main.nf --reference_genome "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&id=CP000253.1&rettype=fasta" --reference_annotation "https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=CP000253.1"
 
 ## Dépendances
 Ce pipeline est basé sur plusieurs dépendances (les mêmes qu'utilisées dans l'article), contenu dans des environnements docker :
 
-- 
-
-
+- sratoolkit v3.0.7
+- trim_galore v0.6.10
+- FastQC v0.11.9
+- cutadapt 4.4 with Python 3.10.12
+- bowtie v0.12.7
+- samtools v1.13
