@@ -1,4 +1,3 @@
-
     Staphylococcus Persistence Profiling Pipeline.
 
     [HOMEPAGE & DOCUMENTATION]: https://gitlab.dsi.universite-paris-saclay.fr/fiona.hak/reprohackathon
@@ -17,9 +16,9 @@
 
     #THREADS CONFIGURATION
     --threads_download [int]                          <default = 4> Number of cpu allocated to download the data.
-	--threads_mapping [int]                           <default = 8> Number of cpu allocated to the mapping.
-	--threads_sort_bam [int]                          <default = 4> Number of cpu allocated to sort the alignment files.
-	--threads_counting [int]                          <default = 4> Number of cpu allocated to the counting reads step.
+--threads_mapping [int]                           <default = 8> Number of cpu allocated to the mapping.
+--threads_sort_bam [int]                          <default = 4> Number of cpu allocated to sort the alignment files.
+--threads_counting [int]                          <default = 4> Number of cpu allocated to the counting reads step.
 
     ##OTHER
     --help                                            Display this message.
