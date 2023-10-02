@@ -5,17 +5,21 @@ nextflow.enable.dsl=2
 process counting_reads {
     label 'subread'
     input:
-        file("$results/BAM/*.bam")
+        file(flag)
         file(annotation_genome)
         val(results)
     output:
         file("counts.txt")
+        file("final_count_matrix.txt")
     when:
         !params.help && !mf.checkFile("$results/COUNTING", "counts", ".txt")
     script:
         """
-        featureCounts -t gene -g ID -s 1 -F GTF -T "${params.threads_counting}" -a $annotation_genome -o $results/COUNTING/counts.txt "$results/BAM/*.bam"
+        featureCounts -t gene -g ID -s 1 -F GTF -T "${params.threads_counting}" -a $annotation_genome -o $results/COUNTING/counts.txt $results/BAM/*.bam
+        cut -f1,7,8,9,10,11,12 $results/COUNTING/counts.txt > $results/COUNTING/final_count_matrix.txt
+        sed -i '1d' $results/COUNTING/final_count_matrix.txt
         ln -s $results/COUNTING/counts.txt counts.txt
+        ln -s $results/COUNTING/final_count_matrix.txt final_count_matrix.txt
         """
 }
 

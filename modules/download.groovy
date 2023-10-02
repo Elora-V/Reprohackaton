@@ -12,7 +12,7 @@ process download_NCBI {
     when:
         !mf.checkFile("$results/FASTQ/RAW", run, "q.gz")
     script:
-    """
+        """
         prefetch $run 
         fasterq-dump $run --skip-technical --threads "${params.threads_download}"
 
