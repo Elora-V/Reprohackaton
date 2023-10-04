@@ -12,7 +12,7 @@ process download_NCBI {
         /* name of the result folder */
         val(results)
     output:
-        /* name of sra file and the downloaded sra file */
+        /* name of sra files and one downloaded sra file */
         tuple val(run), file("${run}.fastq.gz")
     when:
         /* Executed when the fastq file aren't already downloaded (and not the help parameter) */
