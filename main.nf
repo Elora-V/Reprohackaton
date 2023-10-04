@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-nextflow.enable.dsl=2
+nextflow.enable.dsl=2 /* choice of nextflow version */
 
 /*
 ------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ nextflow.enable.dsl=2
 ------------------------------------------------------------------------------------------------------------
 */
 
-// sub-workflow import
+/* Importation of sub-workflows (in "modules") */
 include { initialisation }	from		'./modules/initialisation.groovy'
 include { download }	from		'./modules/download.groovy'
 include { process_fastq }	from		'./modules/process_fastq.groovy'
@@ -30,9 +30,11 @@ include { counting }	from		'./modules/counting.groovy'
 
 workflow {
     main:
-        initialisation()
-        download()
-        process_fastq(download.out)
-        counting(download.out, process_fastq.out)
+
+		/* Call of the sub-workflows */
+        initialisation() 							/* print the help or create folders */
+        download()									/* download fastq, genome and annotation */
+        process_fastq(download.out)					/* trim and map the fastq */
+        counting(download.out, process_fastq.out)	/* count the reads */
 }
 

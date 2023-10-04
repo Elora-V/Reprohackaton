@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-nextflow.enable.dsl=2
+nextflow.enable.dsl=2 /* choice of nextflow version */
 
 process counting_reads {
     label 'subread'
@@ -23,6 +23,7 @@ process counting_reads {
         """
 }
 
+/* Create the class that will contain functions needed in the pipeline  (class define in the "lib" folder) */
 mf = new functions()
 
 workflow counting {
@@ -32,6 +33,8 @@ workflow counting {
     take: all_bam_files
 
     main:
+        /* Retrieval of the path for the result folder */
         results = file(params.results)
+
         counting_reads(all_bam_files, annot_genome, results)
 }

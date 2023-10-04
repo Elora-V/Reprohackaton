@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-nextflow.enable.dsl=2
+nextflow.enable.dsl=2 /* choice of nextflow version */
 
 process trim_single_end {
     label 'cutadapt'
@@ -53,6 +53,7 @@ process mapping_bowtie {
         """
 }
 
+/* Create the class that will contain functions needed in the pipeline  (class define in the "lib" folder) */
 mf = new functions()
 
 workflow process_fastq {
