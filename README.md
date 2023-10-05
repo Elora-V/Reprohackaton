@@ -1,4 +1,4 @@
-# S3P : Staphylococcus Persistence Profiling Pipeline
+# SP_cube : Staphylococcus Persistence Profiling Pipeline
 
 __Celine Guo<sup>1</sup>, Shun Robert<sup>1</sup>, Elora Vigo<sup>1</sup> et Fiona Hak<sup>1</sup>__
 <br>

@@ -1,4 +1,4 @@
-    Staphylococcus Persistence Profiling Pipeline.
+    SP_cube: Staphylococcus Persistence Profiling Pipeline.
 
     [HOMEPAGE & DOCUMENTATION]: https://gitlab.dsi.universite-paris-saclay.fr/fiona.hak/reprohackathon
     [AUTHORS]: Celine Guo, Shun Robert, Elora Vigo, Fiona Hak

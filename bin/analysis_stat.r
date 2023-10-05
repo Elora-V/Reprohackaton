@@ -33,6 +33,7 @@ res$padj <- p.adjust(res$pvalue, method = "BH")
 de_genes <- subset(res, padj < 0.05)
 #length(de_genes$baseMean) #1487 DEG => 10 de plus que dans l'article
 
+#figure supplémentaire 3
 plot(log(res$baseMean),res$log2FoldChange,pch=16, col=(res$padj < 0.05)+1 ) # si pval inf alpha : col = 2 (rouge), sinon noir
 
 ##over-representation analysis

@@ -4,7 +4,7 @@ nextflow.enable.dsl=2 /* choice of nextflow version */
 
 /*
 ------------------------------------------------------------------------------------------------------------
-			 S3P Pipeline - Reprohackathon
+			 SP_cube Pipeline - Reprohackathon
 ------------------------------------------------------------------------------------------------------------
 
 	Staphylococcus Persistence Profiling Pipeline. M2 AMI2B
