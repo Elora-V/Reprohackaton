@@ -22,14 +22,14 @@ colDataFrame <- data.frame(
   Condition = c("Treatment", "Treatment", "Treatment", "Control", "Control", "Control")
 )
 
-# Fichier de nom de gènes : comptage du nombre de ligne du fichier pour ne pas prendre la dernière ligne
-file=file("GeneSpecificInformation_COL.tsv", "r")
+# Fichier de nom de gènes : comptage du nombre de ligne du fichier pour ne pas prendre les dernières lignes
+file=file("GeneSpecificInformation_NCTC8325.tsv", "r")
 nbline = 0
 while (length(readLines(file, n = 1)) > 0) {
   nbline = nbline + 1
 }
 close(file)
-geneName = read.table("GeneSpecificInformation_NCTC8325.tsv", header=T,sep = "\t",nrows=nbline-1) # on enlève la dernière ligne qui bloque le read.table
+geneName = read.table("GeneSpecificInformation_NCTC8325.tsv", header=T,sep = "\t",nrows=nbline-3) # on enlève les dernières lignes qui bloque le read.table
 
 
 
@@ -65,6 +65,8 @@ gene_list <- row.names(de_genes)
 gene_list <- sub("^gene-", "", gene_list)
 
 name_list=geneName[ match(gene_list, geneName[,1]) , 2]
+indexNa=which(is.na(name_list))
+name_list[indexNa]=gene_list[indexNa]
 
 organism_code <- "sao"
 kegg_enrich <- enrichKEGG(
