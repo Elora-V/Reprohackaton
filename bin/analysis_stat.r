@@ -7,6 +7,7 @@ BiocManager::install("DESeq2", force =T )
 #BiocManager::install("clusterProfiler")
 #activer les dépendances
 library("DESeq2")
+library(ggplot2)
 #library("EnrichmentBrowser")
 library("KEGGREST")
 #library("clusterProfiler")
@@ -21,6 +22,17 @@ colDataFrame <- data.frame(
   Condition = c("Treatment", "Treatment", "Treatment", "Control", "Control", "Control")
 )
 
+# Fichier de nom de gènes : comptage du nombre de ligne du fichier pour ne pas prendre la dernière ligne
+file=file("GeneSpecificInformation_COL.tsv", "r")
+nbline = 0
+while (length(readLines(file, n = 1)) > 0) {
+  nbline = nbline + 1
+}
+close(file)
+geneName = read.table("GeneSpecificInformation_NCTC8325.tsv", header=T,sep = "\t",nrows=nbline-1) # on enlève la dernière ligne qui bloque le read.table
+
+
+
 ##normalization and dispersion estimation
 #créer l'objet pour des à partir de la matrice
 dds <- DESeqDataSetFromMatrix(countData, colData = colDataFrame, design = ~ Condition)
@@ -33,12 +45,27 @@ res$padj <- p.adjust(res$pvalue, method = "BH")
 de_genes <- subset(res, padj < 0.05)
 #length(de_genes$baseMean) #1487 DEG => 10 de plus que dans l'article
 
+
 #figure supplémentaire 3
-plot(log(res$baseMean),res$log2FoldChange,pch=16, col=(res$padj < 0.05)+1 ) # si pval inf alpha : col = 2 (rouge), sinon noir
+#plot(log(res$baseMean),res$log2FoldChange,pch=16, col=(res$padj < 0.05)+1 ) # si pval inf alpha : col = 2 (rouge), sinon noir
+
+resdf=data.frame(res)
+ggplot(data = resdf, aes(x = log(baseMean), y = log2FoldChange)) +
+  geom_point(aes(color = padj < 0.05), shape = 16,cex=1) +
+  scale_color_manual(values = c("black", "red")) +
+  labs(
+    x = "log(baseMean)",
+    y = "log2FoldChange",
+    color = "padj < 0.05"
+  ) 
+
 
 ##over-representation analysis
 gene_list <- row.names(de_genes)
 gene_list <- sub("^gene-", "", gene_list)
+
+name_list=geneName[ match(gene_list, geneName[,1]) , 2]
+
 organism_code <- "sao"
 kegg_enrich <- enrichKEGG(
   gene = gene_list,
