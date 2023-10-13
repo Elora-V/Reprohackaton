@@ -1,3 +1,6 @@
+setwd("~/Documents/M2_AMI2B/Reprohackaton/reprohackathon/bin")
+
+
 #R:v4.2.1
 #installation des packages
 install.packages("BiocManager")
@@ -49,7 +52,10 @@ de_genes <- subset(res, padj < 0.05)
 #figure supplémentaire 3
 #plot(log(res$baseMean),res$log2FoldChange,pch=16, col=(res$padj < 0.05)+1 ) # si pval inf alpha : col = 2 (rouge), sinon noir
 
+
+res$log2FoldChange=ifelse(res$log2FoldChange > 4, 4, ifelse(res$log2FoldChange < -4, -4, res$log2FoldChange))
 resdf=data.frame(res)
+
 ggplot(data = resdf, aes(x = log(baseMean), y = log2FoldChange)) +
   geom_point(aes(color = padj < 0.05), shape = 16,cex=1) +
   scale_color_manual(values = c("black", "red")) +
@@ -57,7 +63,13 @@ ggplot(data = resdf, aes(x = log(baseMean), y = log2FoldChange)) +
     x = "log(baseMean)",
     y = "log2FoldChange",
     color = "padj < 0.05"
-  ) 
+  )  +
+  scale_y_continuous(limits = c(-4, 4)) +
+geom_hline(yintercept = 0, linetype = "dashed") +
+   labs(title = "MA-plot of complete RNA-seq dataset")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+
 
 
 ##over-representation analysis
