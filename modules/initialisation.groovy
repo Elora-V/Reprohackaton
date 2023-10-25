@@ -24,33 +24,25 @@ process help {
 /* Process that create the folder for the results : */
 process initializeFolders {
     label 'linux'
-    input:
-    /* Name of the result folder (by default to "results", see nextflow.config) */
-        val results
+    output:val(params.results)
     when:
     /* Executed if the parameter help is not used */
         !params.help
     exec:
     /* Creation of all the folder */
-        file("$results/FASTQ/RAW").mkdirs()         /* for the downloaded fastq */
-        file("$results/FASTQ/FILTERED").mkdirs()    /* for the trimmed fastq */
-        file("$results/BAM").mkdirs()               /* for the bam (mapping) */
-        file("$results/REFERENCE_FILES").mkdirs()   /* for the genome and annotation */
-        file("$results/COUNTING").mkdirs()          /* for the reads counts */
+        file("$params.results/FASTQ/RAW").mkdirs()         /* for the downloaded fastq */
+        file("$params.results/FASTQ/FILTERED").mkdirs()    /* for the trimmed fastq */
+        file("$params.results/BAM").mkdirs()               /* for the bam (mapping) */
+        file("$params.results/REFERENCE_FILES").mkdirs()   /* for the genome and annotation */
+        file("$params.results/COUNTING").mkdirs()          /* for the reads counts */
 }
-
-
 
 
 workflow initialisation {
     main:
-        /* Retrieval of the path for the result folder */
-        results = file(params.results)
-
         /* File containing the error message */
         errorMessage = file("./bin/help.txt")
-
         /* Call of process */
         help(errorMessage)          /* if help message needed */
-        initializeFolders(results)  /* if help message not needed */
+        initializeFolders()  /* if help message not needed */
 }
