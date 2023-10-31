@@ -35,6 +35,7 @@ process initializeFolders {
         file("$params.results/BAM").mkdirs()               /* for the bam (mapping) */
         file("$params.results/REFERENCE_FILES").mkdirs()   /* for the genome and annotation */
         file("$params.results/COUNTING").mkdirs()          /* for the reads counts */
+        file("$params.results/STATS").mkdirs()          /* for the stat analysis */
 }
 
 
@@ -44,5 +45,5 @@ workflow initialisation {
         errorMessage = file("./bin/help.txt")
         /* Call of process */
         help(errorMessage)          /* if help message needed */
-        initializeFolders()  /* if help message not needed */
+        initializeFolders()         /* if help message not needed */
 }

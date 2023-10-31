@@ -31,6 +31,7 @@ process index_bowtie {
     output:
         /* used to indicate the end of this process */
         val index
+        tuple file("${index}.1.ebwt"), file("${index}.2.ebwt"), file("${index}.3.ebwt"), file("${index}.4.ebwt"), file("${index}.rev.1.ebwt"), file("${index}.rev.2.ebwt")
     publishDir path: "${params.results}/BAM", mode: 'copy'
     when:
         /* Executed when the genome is downloaded (and not the help parameter) */
@@ -49,13 +50,14 @@ process mapping_bowtie {
         tuple val(run), file("${run}_trimmed.fq.gz")
         /* output of previous process (used to link the two process) */
         val index
+        tuple file("${index}.1.ebwt"), file("${index}.2.ebwt"), file("${index}.3.ebwt"), file("${index}.4.ebwt"), file("${index}.rev.1.ebwt"), file("${index}.rev.2.ebwt")
     output:
         /* one mapped file */
         file("${run}.bam")
     publishDir path: "${params.results}/BAM", mode: 'copy'
     when:
         /* Executed when the mapped file doesn't exist, the genome is downloaded and the trimmed fastq exist (and not the help parameter) */
-        !params.help && !mf.checkFile("$results/BAM", run, "bam") && mf.checkFile("$results/REFERENCE_FILES", "reference", "fasta") && mf.checkFile("$results/FASTQ/FILTERED", run, "q.gz")
+        !params.help && !mf.checkFile("$results/BAM", run, "bam")
     script:
         """
         # Mapping with bowtie (using the index) and sorting with samtools
