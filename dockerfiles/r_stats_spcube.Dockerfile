@@ -6,6 +6,6 @@ RUN apt-get update -y && \
     libssl-dev \
     libcurl4-openssl-dev
 
-RUN R -e "install.packages(c('BiocManager', 'curl', 'XML'))"
+RUN R -e "install.packages(c('BiocManager', 'curl', 'XML', 'ggplot2', 'ggplot2', 'ggrepel'))"
 
 RUN R -e "BiocManager::install(c('DESeq2', 'EnrichmentBrowser', 'clusterProfiler'))"
