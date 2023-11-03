@@ -2,8 +2,7 @@
 
 nextflow.enable.dsl=2 /* choice of nextflow version */
 
-
-/* Process that count the number of reads for each gene */
+/* Process for counting reads using featureCounts */
 process counting_reads {
     label 'subread'
     input:
@@ -75,6 +74,6 @@ workflow counting {
 
     main:
         /* Call the counting process */
-        counting_reads(all_bam_files, annot_genome) /* executed only when all_bam_files is complete (previous step finished) */
+        counting_reads(all_bam_files, annot_genome) /* Executed only when all_bam_files is complete (previous step finished) */
         analyse_stat(counting_reads.out, file("./bin/GSE139659_IPvsctrl.complete.xls"), file("./bin/GeneSpecificInformation_NCTC8325.tsv"), file("./bin/geneTranslation.txt"), file("./bin/analysis_stat.r"))
 }

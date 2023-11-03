@@ -1,9 +1,11 @@
 #!/usr/bin/env nextflow
 
 nextflow.enable.dsl=2  /* choice of nextflow version */
+/*
+This Nextflow script provides help information and initializes the folder structure for storing results.
+*/
 
-
-/* Process that print the help in the console  : */
+/* Process for printing the help in the console  : */
 process help {
     label 'linux'
     input:
@@ -14,7 +16,7 @@ process help {
     By default (when not used), help = false (see nextflow.config) */
         params.help
     exec:
-    /* Print the given file */
+    /* Print the content of the given file */
         "cat $errorMessage".execute().text.readLines().each{println it}
 }
 

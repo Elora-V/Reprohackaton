@@ -1,6 +1,8 @@
 #!/usr/bin/env nextflow
 
 nextflow.enable.dsl=2 /* choice of nextflow version */
+/*
+This Nextflow script trims single-end FASTQ files, builds an index for mapping with Bowtie, and performs the mapping. /*
 
 process trim_single_end {
     label 'cutadapt'
