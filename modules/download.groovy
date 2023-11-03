@@ -1,4 +1,8 @@
 #!/usr/bin/env nextflow
+/*
+This pipeline downloads FASTQ files from SRA, as well as a reference genome and reference annotation.
+
+*/
 
 nextflow.enable.dsl=2 /* choice of nextflow version */
 
@@ -71,12 +75,14 @@ workflow download {
          - split the file by line 
          - suppress the space in each line
          - keep only lines that doesn't start by # (comment line) */
+         
+         /* Création d'un canal */
         SRA = Channel.from(file(params.sra)).splitText().map{it -> it.trim()}.filter(it -> it !=~ /^#/)
 
         /* Call the process */
-        download_NCBI(SRA)                                 /* download the fastq in results */
-        download_reference_genome()                        /* download the genome in "/REFERENCE_FILES" in results */
-        download_reference_annotation()                    /* download the annotation in "/REFERENCE_FILES" in results*/
+        download_NCBI(SRA)                                 /* FASTQ file download process from SRA */
+        download_reference_genome()  /* Reference genome download process */
+        download_reference_annotation()                    /* Reference annotation download process */
     emit:
     /* Send by channel the downloaded files */
         fastq_files=download_NCBI.out
