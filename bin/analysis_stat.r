@@ -147,6 +147,8 @@ if (data == 0){
 
 library(ggrepel)
 
+res_transl["SAOUHSC_00475","name"]="pth"
+
 maplot_transl <- ggplot(data = res_transl, aes(x = log2(baseMean), y = log2FoldChange)) +
   geom_point(aes(color = padj < 0.05), shape = 16, cex = 1.5) +
   scale_color_manual(values = c("black", "red")) +
@@ -158,13 +160,13 @@ maplot_transl <- ggplot(data = res_transl, aes(x = log2(baseMean), y = log2FoldC
     title = "MA-plot of translation genes"
   ) +
   theme(plot.title = element_text(hjust = 0.5)) +
-  geom_label_repel(data = subset(res_transl, !grepl("^SAOUHSC", name)),
+  geom_label_repel(data = res_transl[match(c("frr","infA","infB","infC","pth","tsf"), res_transl$name),] ,  
                    aes(label = name),
                    box.padding = unit(0.5, "lines"),
                    point.padding = unit(0.3, "lines"))
 
 print(maplot_transl)
-
+#  !grepl("^SAOUHSC", name)
         
 if (data == 0){
  titre="MA-plot.pdf"
