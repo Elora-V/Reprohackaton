@@ -138,10 +138,6 @@ de_genes <- subset(res, padj < 0.05)
 #length(de_genes$baseMean) #1487 DEG => 10 de plus que dans l'article
 
 
-
-
-
-
 if (data == 0){
   RES=res
   GeneDiff=de_genes
