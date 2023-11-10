@@ -154,5 +154,18 @@ sao:SAOUHSC_R0006    K01980 23S ribosomal RNA | (RefSeq) 23S Ribosomal RNA
 sao:SAOUHSC_R0007    K01980 23S ribosomal RNA | (RefSeq) 23S Ribosomal RNA 
 sao:SAOUHSC_R0008    K01980 23S ribosomal RNA | (RefSeq) 23S Ribosomal RNA 
 sao:SAOUHSC_R0009    K01980 23S ribosomal RNA | (RefSeq) 23S Ribosomal RNA 
-
+SAOUHSC_01246 infB; translation initiation factor IF-2
+SAOUHSC_01786 infC; translation initiation factor IF-3
+SAOUHSC_02274 ABC transporter ATP-binding protein
+SAOUHSC_01234 tsf; elongation factor Ts
+SAOUHSC_00530 tuf; elongation factor Tu
+SAOUHSC_00529 fusA; elongation factor G
+SAOUHSC_02359 prfA; peptide chain release factor 1
+SAOUHSC_01236 frr; ribosome recycling factor
+SAOUHSC_02358 HemK family modification methylase
+SAOUHSC_00475 peptidyl-tRNA hydrolase
+SAOUHSC_02489 infA; translation initiation factor IF-1
+SAOUHSC_01625 elongation factor P
+SAOUHSC_00771 peptide chain release factor 2
+SAOUHSC_00956 prfC; peptide chain release factor 3
 
