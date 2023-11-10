@@ -6,21 +6,23 @@ GSE139659_IPvsctrl.complete <- args[2]
 GeneSpecificInformation_NCTC8325 <- args[3]
 geneTranslation <- args[4]
 
+#R:v4.2.1
+#dependencies activation
+library("DESeq2")
+library(ggplot2)
+library(ggrepel)
+
 
 # We execute the scripts for the data of the article (data=1), then our data (data=0)
 for (data in c(1,0)){
-
-  #R:v4.2.1
-  #dependencies activation
-  library("DESeq2")
-  library(ggplot2)
-  library(ggrepel)
-
 
   ### Opening Counting matrix ----
   if (data == 0){ # our data
     # output of featureCount
     countData = read.table(final_count_matrix, header = TRUE, row.names = 1, sep = "\t")
+    colnames(countData)=c("Treatment1","Treatment2","Treatment3","Control1","Control2","Control3")
+    rownames(countData)=sub("^gene-", "", rownames(countData))
+    DATA=countData
     # association of condition to colums (replicates)
     colDataFrame <- data.frame(
       Sample = colnames(countData),
@@ -28,16 +30,18 @@ for (data in c(1,0)){
     )
   } else {
     # data of article
-    countData=read.delim(GSE139659_IPvsctrl.complete,header=T,row.names = NULL) # pour tester avec la vrai matrice
-    countData=countData[1:2967,]
-    rownames(countData)=countData$Name
-    countData=countData[,6:11] # we keep only the genes names and the replicates for the two conditions
+    tab=read.delim(GSE139659_IPvsctrl.complete,header=T,row.names = NULL) # pour tester avec la vrai matrice
+    tab=tab[1:2967,]
+    rownames(tab)=tab$Name
+    Deseq2_A=tab[,12:17]
+    countData=tab[,6:11]
     countData= na.omit(countData)
-    # association of condition to colums (replicates)
+    DATA_A=countData
     colDataFrame <- data.frame(
       Sample = colnames(countData),
       Condition = c("Control", "Control", "Control","Treatment", "Treatment", "Treatment")
-    )
+    ) 
+    
   }
 
   ### Opening Genes names matrix ----
@@ -217,4 +221,130 @@ for (data in c(1,0)){
   dev.off() 
   
 }
+
+#### Comparing results ----
+
+print("################")
+
+### Comparing the counting matrix
+print(paste("There is ",dim(RES)[1],"genes (our data)."))
+#  "There is  2967 genes (our data)."
+print(paste("There is ",dim(RES_A)[1],"genes (data article)."))
+#  "There is  2967 genes (data article)."
+
+# change order line to be the same as the results in the article
+orderGene=match(rownames((RES_A)), rownames(RES))
+print(paste("There is ",length(which(is.na(orderGene)==TRUE)), "genes in the article's data not in our data."))
+# "There is  0 genes in the article's data not in our data."
+
+# => Same genes in both matrix
+
+# Data with article's data and our data
+
+DATA=DATA[orderGene,]
+fullCounts=cbind(DATA,DATA_A)
+colDataFrame= data.frame(
+  Sample = colnames(fullCounts),
+  Condition = c(rep("Treatment",3),rep( "Control",6),rep("Treatment",3))
+)
+ddsfull= DESeqDataSetFromMatrix(fullCounts, colData = colDataFrame, design = ~ Condition)
+vsdata = vst(ddsfull, blind=FALSE)
+PCA = plotPCA(vsdata, intgroup = "Condition", returnData = TRUE)
+PCAplot=ggplot(PCA, aes(x = PC1, y = PC2, color = Condition)) +
+  geom_point()+
+  geom_label_repel(data = PCA ,  
+                   aes(label = rownames(PCA)),
+                   box.padding = unit(0.5, "lines"),
+                   point.padding = unit(0.3, "lines")) 
+cor= as.matrix(cor(counts(ddsfull)))
+
+# => Treatments of both dataset are closer together than to the control, same idea for control.
+# => Treatments1 closer to IP1 (treatment 1 for article), same for the others.
+## => Both counting matrix are similar.
+
+
+### Comparing deseq2 results
+
+# DESeq2 article vs DESeq2 conting matrix article
+
+Deseq2_A=Deseq2_A[match(rownames(RES_A),rownames(Deseq2_A)),]
+fullRES=data.frame(fold1=Deseq2_A$log2FoldChange,fold2=RES_A$log2FoldChange)
+fullRES=na.omit(fullRES)
+dim(fullRES) #2736
+foldSimilaire=sum(abs(fullRES$fold1-fullRES$fold2)<= 10**(-7) )
+print(paste("Il y a ",foldSimilaire," gènes qui ont leurs foldchanges égaux pour une précision de 10**-7, entre les deux formes de résultats de l'article parmi ",dim(fullRES)[1]," gènes non NA"))
+# "Il y a  2736  gènes qui ont leurs foldchanges égaux pour une précision de 10**-7,
+# entre les deux formes de résultats de l'article parmi  2736  gènes non NA" 
+
+# => ~ Meme logFoldChange entre les deux types de données de l'article
+
+
+# DEseq between our data and article's data
+
+RES=RES[match(rownames(RES_A),rownames(RES)),]
+fullRES=data.frame(fold1=RES$log2FoldChange,fold2=RES_A$log2FoldChange)
+fullRES=na.omit(fullRES)
+dim(fullRES) #2730
+foldSimilaire=sum(abs(fullRES$fold1-fullRES$fold2)<= 10**(-1) )
+print(paste("Il y a ",foldSimilaire," gènes qui ont leurs foldchanges différe au maximum de 0.1, entre les résultats de l'article et les nôtres parmi ",dim(fullRES)[1]," gènes non NA"))
+# "Il y a  1677  gènes qui ont leurs foldchanges différe au maximum de 0.1,
+# entre les résultats de l'article et les nôtres parmi  2730  gènes non NA"
+
+foldSimilaire=sum(abs(fullRES$fold1-fullRES$fold2)<= 0.2)
+print(paste("Il y a ",foldSimilaire," gènes qui ont leurs foldchanges différe au maximum de 0.2, entre les résultats de l'article et les nôtres parmi",dim(fullRES)[1]," gènes non NA"))
+"Il y a  2116  gènes qui ont leurs foldchanges différe au maximum de 0.2, 
+# entre les résultats de l'article et les nôtres parmi 2730  gènes non NA"
+
+moy=mean(abs(fullRES$fold1-fullRES$fold2) )
+summary(c(fullRES[,1]),fullRES[,2])
+#     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+#-5.04344 -0.94906 -0.04698  0.04562  0.92211  5.88998 
+print(paste("En moyenne diffère de ",round(moy,2)," en foldchange pour des valeurs de foldchange entre -5 et 5, avec pour moyenne 0.046."))
+
+# =>  "En moyenne diffère de  0.25  en foldchange pour des valeurs de foldchange entre -5 et 5, avec pour moyenne 0.046."
+
+# DEG
+
+GeneDiff_deseq= subset(Deseq2_A, padj < 0.05)
+
+print(paste("There is ",dim(GeneDiff)[1]," DEG genes (our data)."))
+#"There is  1487  DEG genes (our data)."
+print(paste("There is ",dim(GeneDiff_A)[1],"DEG genes (data article)."))
+# "There is  1479 DEG genes (data article)."
+print(paste("There is ",dim(GeneDiff_deseq)[1],"DEG genes (data article deseq2)."))
+# "There is  1479 DEG genes (data article deseq2)."
+
+
+CommunDEG=length(intersect(rownames((GeneDiff_A)), rownames(GeneDiff)))
+CommunDEG_A=length(intersect(rownames((GeneDiff_A)), rownames(GeneDiff_deseq)))
+
+print(paste("Il y a ",CommunDEG_A," genes différentiels commun entre les deux jeux de l'article."))
+# "Il y a  1479  genes différentiels commun entre les deux jeux de l'article."
+print(paste("Il y a ",CommunDEG," genes différentiels commun entre l'article et nos résultats."))
+# "Il y a  1352  genes différentiels commun entre l'article et nos résultats."
+
+### Comparing differential translation gene
+
+print(paste("Il y a ",dim(REST)[1], "gene de traduction parmi les gènes étudiés."))
+# "Il y a  167 gene de traduction parmi les gènes étudiés."
+DEGtrans=subset(REST,padj<0.05)
+DEGtrans_A=subset(REST_A,padj<0.05)
+print(paste("Il y a ", dim(DEGtrans)[1], " genes de traduction exprimés différentiellement dans nos données."))
+#"Il y a  57  genes de traduction exprimés différentiellement dans nos données."
+print(paste("Il y a ", dim(DEGtrans_A)[1], " genes de traduction exprimés différentiellement dans nos données."))
+# Il y a  53  genes de traduction exprimés différentiellement dans nos données."
+
+CommunDEGTrans=length(intersect(rownames(DEGtrans),rownames(DEGtrans_A)))
+print(paste("Il y a ",CommunDEGTrans," genes  de traductions communs exprimés différentiellement entre nos données et l'article."))
+#  "Il y a  47  genes de traductions communs exprimés différentiellement entre nos données et l'article."
+
+
+
+# PDF ----
+pdf("Comparaison resultats", width = 10, height = 7)
+print(PCAplot)
+print(heatmap(cor))
+dev.off()
+
+
 
