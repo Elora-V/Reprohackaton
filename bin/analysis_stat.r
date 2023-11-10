@@ -2,6 +2,10 @@ setwd("~/Documents/M2_AMI2B/Reprohackaton/reprohackathon/bin")
 rm(list = ls())
 
 
+library("DESeq2")
+library(ggplot2)
+library(ggrepel)
+
 
 #data = 0 si nos données, 1 sinon
 
@@ -27,6 +31,7 @@ library(ggplot2)
 if (data == 0){
 #analyse statistique de la sortie featureCount
 countData = read.table("final_count_matrix.txt", header = TRUE, row.names = 1, sep = "\t")
+colnames(countData)=c("Treatment1","Treatment2","Treatment3","Control1","Control2","Control3")
 #affecter les conditions
 colDataFrame <- data.frame(
   Sample = colnames(countData),
@@ -64,6 +69,54 @@ geneName = read.table("GeneSpecificInformation_NCTC8325.tsv", header=T,sep = "\t
 ##normalization and dispersion estimation
 #créer l'objet pour deseq2 à partir de la matrice
 dds <- DESeqDataSetFromMatrix(countData, colData = colDataFrame, design = ~ Condition)
+
+### Exploratory analysis ----
+
+# Histogram of read counts
+histCounts=ggplot( log2(data.frame(x=c(counts(dds)))), aes(x = x)) +
+            geom_histogram() +
+        labs(title = "Histogram of read counts (log2)",
+       x = "Log2(Read Counts)",
+       y = "Frequency")
+
+
+# Number of read per replicates
+countlog=log2(counts(dds)+1)
+n=dim(countlog)[1]
+if (data == 0){
+    legend=c(rep("Treatment",3*n), rep("Control",3*n))
+    label=c(rep("Treatment1",n),rep("Treatment2",n),rep("Treatment3",n),rep("Control1",n),rep("Control2",n),rep("Control3",n))
+
+}else{
+  legend=c(rep("Control",3*n), rep("Treatment",3*n))
+  label=c(rep("Control1",n),rep("Control2",n),rep("Control3",n),rep("Treatment1",n),rep("Treatment2",n),rep("Treatment3",n))
+}
+df=data.frame(x=c(countlog),  y=label, col=legend )
+boxplotCounts=ggplot(df, aes(x=x, y=y, col = legend)) +
+  geom_boxplot()
+
+
+# Correlation heatmap between replicates
+cor= cor(counts(dds))
+# heatmap in the pdf directly  
+
+# PCA
+# VST transformation (variance stabilizing transformation)
+vsdata = vst(dds, blind=FALSE)
+
+# get PCA coordinates 
+PCA = plotPCA(vsdata, intgroup = "Condition", returnData = TRUE)
+
+# Création du graphique PCA
+PCAplot=ggplot(PCA, aes(x = PC1, y = PC2, color = Condition)) +
+  geom_point()+
+  geom_label_repel(data = PCA ,  
+                   aes(label = rownames(PCA)),
+                   box.padding = unit(0.5, "lines"),
+                   point.padding = unit(0.3, "lines")) 
+
+
+
 dds <- DESeq(dds)
 res <- results(dds)
 #Changement des noms de lignes et Ajout des symboles des genes du tableau de résultat
@@ -80,6 +133,9 @@ res$padj <- p.adjust(res$pvalue, method = "BH")
 # differentially expressed genes (DEG)
 de_genes <- subset(res, padj < 0.05)
 #length(de_genes$baseMean) #1487 DEG => 10 de plus que dans l'article
+
+
+
 
 
 
@@ -174,8 +230,13 @@ if (data == 0){
   titre="MA-plot_article.pdf"
 }
 pdf(titre, width = 10, height = 7)
-print(maplot)     # in the first page of PDF
-print(maplot_transl)     # in the second page of the PDF
+print(histCounts)
+print(boxplotCounts)
+print(heatmap(cor))
+print(PCAplot)
+print(hist(res$padj))
+print(maplot)     
+print(maplot_transl)    
 dev.off() 
 
 # 
