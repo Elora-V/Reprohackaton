@@ -6,86 +6,92 @@ GSE139659_IPvsctrl.complete <- args[2]
 GeneSpecificInformation_NCTC8325 <- args[3]
 geneTranslation <- args[4]
 
-#data = 0 si nos données, 1 sinon
 
+# We execute the scripts for the data of the article (data=1), then our data (data=0)
 for (data in c(1,0)){
 
   #R:v4.2.1
-  #activer les dépendances
+  #dependencies activation
   library("DESeq2")
   library(ggplot2)
   library(ggrepel)
 
 
-  ### Counting matrix
-  if (data == 0){
-    #analyse statistique de la sortie featureCount
+  ### Opening Counting matrix
+  if (data == 0){ # our data
+    # output of featureCount
     countData = read.table(final_count_matrix, header = TRUE, row.names = 1, sep = "\t")
-    #affecter les conditions
+    # association of condition to colums (replicates)
     colDataFrame <- data.frame(
       Sample = colnames(countData),
       Condition = c("Treatment", "Treatment", "Treatment", "Control", "Control", "Control")
     )
   } else {
-    # pr celle de l'article
+    # data of article
     countData=read.delim(GSE139659_IPvsctrl.complete,header=T,row.names = NULL) # pour tester avec la vrai matrice
     countData=countData[1:2967,]
     rownames(countData)=countData$Name
-    countData=countData[,6:11]
+    countData=countData[,6:11] # we keep only the genes names and the replicates for the two conditions
     countData= na.omit(countData)
+    # association of condition to colums (replicates)
     colDataFrame <- data.frame(
       Sample = colnames(countData),
       Condition = c("Control", "Control", "Control","Treatment", "Treatment", "Treatment")
     )
   }
 
-  ### Genes names matrix
+  ### Opening Genes names matrix
 
-  # Fichier de nom de gènes : comptage du nombre de ligne du fichier pour ne pas prendre les dernières lignes
+  # Gene name file : counting of the number of lines of the file, needed to not take into account the last lines (error)
   file=file(GeneSpecificInformation_NCTC8325, "r")
   nbline = 0
   while (length(readLines(file, n = 1)) > 0) {
     nbline = nbline + 1
   }
   close(file)
-  geneName = read.table(GeneSpecificInformation_NCTC8325, header=T,sep = "\t",nrows=nbline-3) # on enlève les dernières lignes qui bloque le read.table
+  # opening the file as the table
+  geneName = read.table(GeneSpecificInformation_NCTC8325, header=T,sep = "\t",nrows=nbline-3) 
 
+  
   ### Differential expression analysis
 
-  ##normalization and dispersion estimation
-  #créer l'objet pour deseq2 à partir de la matrice
+  # creation of deseq2 objet from the matrix
   dds <- DESeqDataSetFromMatrix(countData, colData = colDataFrame, design = ~ Condition)
+  # normalization and dispersion estimation
   dds <- DESeq(dds)
   res <- results(dds)
-  #Changement des noms de lignes et Ajout des symboles des genes du tableau de résultat
+  
+  # get symbol of genes and add them in the deseq2 results
   rownames(res)=sub("^gene-", "", rownames(res))
   name=geneName[ match(rownames(res),geneName[,1]) , 2]
   indexNa=which(is.na(name))
-  name[indexNa]=rownames(res)[indexNa]
-  res$name=name
+  name[indexNa]=rownames(res)[indexNa] # when there is no match in the gene name table, we use the full name
+  res$name=name # we add a column with the short names (or symbols)
 
-  #adjust p-values using the Benjamini and Hochberg procedure
+  # adjusting the p-values using the Benjamini and Hochberg procedure
   res$padj <- p.adjust(res$pvalue, method = "BH")
-  #genes with an adjusted p value lower than 0.05 were considered differentially expressed
-  # differentially expressed genes (DEG)
+  # genes with an adjusted p value lower than 0.05 were considered differentially expressed genes (DEG)
   de_genes <- subset(res, padj < 0.05)
   #length(de_genes$baseMean) #1487 DEG => 10 de plus que dans l'article
 
+  # We keep the results for those data in order to compare the result with the two dataset
   if (data == 0){
-    RES=res
-    GeneDiff=de_genes
+    RES=res # result of deseq2
+    GeneDiff=de_genes # DEG
   } else {
-    RES_A=res
-    GeneDiff_A=de_genes
+    RES_A=res # result of deseq2 article
+    GeneDiff_A=de_genes # DEG article
   }
 
-  #### Figure supplémentaire 3 : MA plot
+  #### Figure 3 : full MA plot
 
+  # In the article, the y limit of the plot are -4 and 4 :
   res$log2FoldChange=ifelse(res$log2FoldChange > 4, 4, ifelse(res$log2FoldChange < -4, -4, res$log2FoldChange))
-  resdf=data.frame(res)
+  resdf=data.frame(res) # conversion in dataframe
 
+  # full MA-plot with ggplot2
   maplot=ggplot(data = resdf, aes(x = log(baseMean), y = log2FoldChange)) +
-    geom_point(aes(color = padj < 0.05), shape = 16,cex=1) +
+    geom_point(aes(color = padj < 0.05), shape = 16,cex=1) + # the color depend on the pvalue
     scale_color_manual(values = c("black", "red")) +
     labs(
       x = "log(baseMean)",
@@ -93,40 +99,43 @@ for (data in c(1,0)){
       color = "padj < 0.05"
     )  +
     scale_y_continuous(limits = c(-4, 4)) +
-    geom_hline(yintercept = 0, linetype = "dashed") +
+    geom_hline(yintercept = 0, linetype = "dashed") + # line at 0
     labs(title = "MA-plot of complete RNA-seq dataset")+
     theme(plot.title = element_text(hjust = 0.5))
 
 
   #### Figure 3c : MA plot for translation
 
-  # genes for translation
+  # get list of genes for translation
 
-  transl=read.table(geneTranslation,sep="\t") # separateur ne sépare rien, mais c'est normal car le format des lignes diffèrent
-  transl[,1] <- sub("^\\s+", "", transl[,1])  # supprime les premiers espaces
-  transl[,1] <- sub("^(\\S+).*", "\\1", transl[,1]) # on récupère juste le nom du gène
+  transl=read.table(geneTranslation,sep="\t") # not a good format, all the informations on the same line
+  transl[,1] <- sub("^\\s+", "", transl[,1])  # suppress first spaces 
+  transl[,1] <- sub("^(\\S+).*", "\\1", transl[,1]) # get gene name (the first word)
+  # Explanation of the command :
   # sub(pattern, replacement, data)
-  # ^ indique que c'est en début de chaine
-  # (\\S+) correspond à un ou plusieurs caractères consécutifs qui ne sont pas des espaces blancs
-  # "\1" fait référence au premier groupe de capture
-  transl[,1] <- sub("^sao:", "", transl[,1])
+  # ^ : beggining of the string
+  # (\\S+) : one or more consecutives characters which aren't spaces
+  # "\1" : first element
+  transl[,1] <- sub("^sao:", "", transl[,1]) # suppress "sao:" of the name
 
-  ## result for translation
+  ## get result for translation
 
   index_transl=match(transl[,1],rownames(res))
   index_transl=na.omit(index_transl) # 3 NA
-  res_transl=data.frame(res[index_transl,])
+  res_transl=data.frame(res[index_transl,]) # we keep the dese2 results only for the translation genes
 
   if (data == 0){
-    REST=res_transl
+    REST=res_transl # deseq2 results for translation
   } else {
-    REST_A=res_transl
+    REST_A=res_transl  # deseq2 results for translation, for the article
   }
 
-  # MA plot (translation)
+  # MA plot translation
 
-  maplot_transl <- ggplot(data = res_transl, aes(x = log2(baseMean), y = log2FoldChange)) +
-    geom_point(aes(color = padj < 0.05), shape = 16, cex = 1.5) +
+  res_transl["SAOUHSC_00475","name"]="pth" # one gene with wrong symbol
+  
+  maplot_transl = ggplot(data = res_transl, aes(x = log2(baseMean), y = log2FoldChange)) +
+    geom_point(aes(color = padj < 0.05), shape = 16, cex = 1.5) + # color depend on pvalue
     scale_color_manual(values = c("black", "red")) +
     geom_hline(yintercept = 0, linetype = "dashed") +
     labs(
@@ -136,14 +145,14 @@ for (data in c(1,0)){
       title = "MA-plot of translation genes"
     ) +
     theme(plot.title = element_text(hjust = 0.5)) +
-    geom_label_repel(data = subset(res_transl, !grepl("^SAOUHSC", name)),
+    geom_label_repel(data = res_transl[match(c("frr","infA","infB","infC","pth","tsf"), res_transl$name),] ,  # get only gene in the list given
                      aes(label = name),
                      box.padding = unit(0.5, "lines"),
                      point.padding = unit(0.3, "lines"))
-
-  print(maplot_transl)
-
-
+  
+  
+ 
+  # title of the pdf with the MA plot
   if (data == 0){
     titre="MA-plot.pdf"
   } else {
