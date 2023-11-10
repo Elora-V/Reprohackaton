@@ -17,7 +17,7 @@ for (data in c(1,0)){
   library(ggrepel)
 
 
-  ### Opening Counting matrix
+  ### Opening Counting matrix ----
   if (data == 0){ # our data
     # output of featureCount
     countData = read.table(final_count_matrix, header = TRUE, row.names = 1, sep = "\t")
@@ -40,7 +40,7 @@ for (data in c(1,0)){
     )
   }
 
-  ### Opening Genes names matrix
+  ### Opening Genes names matrix ----
 
   # Gene name file : counting of the number of lines of the file, needed to not take into account the last lines (error)
   file=file(GeneSpecificInformation_NCTC8325, "r")
@@ -53,10 +53,58 @@ for (data in c(1,0)){
   geneName = read.table(GeneSpecificInformation_NCTC8325, header=T,sep = "\t",nrows=nbline-3) 
 
   
-  ### Differential expression analysis
-
-  # creation of deseq2 objet from the matrix
+  
+  # Creation of deseq2 objet from the matrix
   dds <- DESeqDataSetFromMatrix(countData, colData = colDataFrame, design = ~ Condition)
+  
+  
+  ### Exploratory analysis ----
+  
+  # Histogram of read counts
+  histCounts=ggplot( log2(data.frame(x=c(counts(dds)))), aes(x = x)) +
+    geom_histogram() +
+    labs(title = "Histogram of read counts (log2)",
+         x = "Log2(Read Counts)",
+         y = "Frequency")
+  
+  
+  # Number of read per replicates
+  countlog=log2(counts(dds)+1)
+  n=dim(countlog)[1]
+  if (data == 0){
+    legend=c(rep("Treatment",3*n), rep("Control",3*n))
+    label=c(rep("Treatment1",n),rep("Treatment2",n),rep("Treatment3",n),rep("Control1",n),rep("Control2",n),rep("Control3",n))
+    
+  }else{
+    legend=c(rep("Control",3*n), rep("Treatment",3*n))
+    label=c(rep("Control1",n),rep("Control2",n),rep("Control3",n),rep("Treatment1",n),rep("Treatment2",n),rep("Treatment3",n))
+  }
+  df=data.frame(x=c(countlog),  y=label, col=legend )
+  boxplotCounts=ggplot(df, aes(x=x, y=y, col = legend)) +
+    geom_boxplot()
+  
+  
+  # Correlation heatmap between replicates
+  cor= cor(counts(dds))
+  # heatmap in the pdf directly  
+  
+  # PCA
+  # VST transformation (variance stabilizing transformation)
+  vsdata = vst(dds, blind=FALSE)
+  
+  # get PCA coordinates 
+  PCA = plotPCA(vsdata, intgroup = "Condition", returnData = TRUE)
+  
+  # plot PCA
+  PCAplot=ggplot(PCA, aes(x = PC1, y = PC2, color = Condition)) +
+    geom_point()+
+    geom_label_repel(data = PCA ,  
+                     aes(label = rownames(PCA)),
+                     box.padding = unit(0.5, "lines"),
+                     point.padding = unit(0.3, "lines")) 
+  
+  ### Differential expression analysis ----
+  
   # normalization and dispersion estimation
   dds <- DESeq(dds)
   res <- results(dds)
@@ -83,7 +131,7 @@ for (data in c(1,0)){
     GeneDiff_A=de_genes # DEG article
   }
 
-  #### Figure 3 : full MA plot
+  #### Figure 3 : full MA plot ----
 
   # In the article, the y limit of the plot are -4 and 4 :
   res$log2FoldChange=ifelse(res$log2FoldChange > 4, 4, ifelse(res$log2FoldChange < -4, -4, res$log2FoldChange))
@@ -104,7 +152,7 @@ for (data in c(1,0)){
     theme(plot.title = element_text(hjust = 0.5))
 
 
-  #### Figure 3c : MA plot for translation
+  #### Figure 3c : MA plot for translation ----
 
   # get list of genes for translation
 
@@ -151,7 +199,7 @@ for (data in c(1,0)){
                      point.padding = unit(0.3, "lines"))
   
   
- 
+  #### PDF ----
   # title of the pdf with the MA plot
   if (data == 0){
     titre="MA-plot.pdf"
@@ -159,8 +207,14 @@ for (data in c(1,0)){
     titre="MA-plot_article.pdf"
   }
   pdf(titre, width = 10, height = 7)
-  print(maplot)            # in the first page of PDF
-  print(maplot_transl)     # in the second page of the PDF
-  dev.off()
+  print(histCounts)
+  print(boxplotCounts)
+  print(heatmap(cor))
+  print(PCAplot)
+  print(hist(res$padj))
+  print(maplot)     
+  print(maplot_transl)    
+  dev.off() 
+  
 }
 
