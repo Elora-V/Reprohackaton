@@ -341,7 +341,7 @@ print(paste("Il y a ",CommunDEGTrans," genes  de traductions communs exprimés d
 
 
 # PDF ----
-pdf("Comparaison resultats", width = 10, height = 7)
+pdf("Comparaison_resultats.pdf", width = 10, height = 7)
 print(PCAplot)
 print(heatmap(cor))
 dev.off()
