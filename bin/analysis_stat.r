@@ -331,8 +331,8 @@ DEGtrans=subset(REST,padj<0.05)
 DEGtrans_A=subset(REST_A,padj<0.05)
 print(paste("Il y a ", dim(DEGtrans)[1], " genes de traduction exprimés différentiellement dans nos données."))
 #"Il y a  57  genes de traduction exprimés différentiellement dans nos données."
-print(paste("Il y a ", dim(DEGtrans_A)[1], " genes de traduction exprimés différentiellement dans nos données."))
-# Il y a  53  genes de traduction exprimés différentiellement dans nos données."
+print(paste("Il y a ", dim(DEGtrans_A)[1], " genes de traduction exprimés différentiellement dans les données de l'article."))
+# Il y a  53  genes de traduction exprimés différentiellement dans les données de l'article."
 
 CommunDEGTrans=length(intersect(rownames(DEGtrans),rownames(DEGtrans_A)))
 print(paste("Il y a ",CommunDEGTrans," genes  de traductions communs exprimés différentiellement entre nos données et l'article."))
