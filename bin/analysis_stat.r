@@ -292,7 +292,7 @@ print(paste("Il y a ",foldSimilaire," gènes qui ont leurs foldchanges différe 
 
 foldSimilaire=sum(abs(fullRES$fold1-fullRES$fold2)<= 0.2)
 print(paste("Il y a ",foldSimilaire," gènes qui ont leurs foldchanges différe au maximum de 0.2, entre les résultats de l'article et les nôtres parmi",dim(fullRES)[1]," gènes non NA"))
-"Il y a  2116  gènes qui ont leurs foldchanges différe au maximum de 0.2, 
+#"Il y a  2116  gènes qui ont leurs foldchanges différe au maximum de 0.2, 
 # entre les résultats de l'article et les nôtres parmi 2730  gènes non NA"
 
 moy=mean(abs(fullRES$fold1-fullRES$fold2) )
