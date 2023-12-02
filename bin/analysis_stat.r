@@ -212,7 +212,6 @@ for (data in c(1,0)){
 }
 
 pdf(titre, width = 10, height = 7)
-dev.off()
 
 pdf("histCounts.pdf", width = 10, height = 7)
 print(histCounts)
@@ -240,6 +239,8 @@ dev.off()
 
 pdf("maplot_transl.pdf", width = 10, height = 7)
 print(maplot_transl)
+dev.off()
+
 dev.off()
   
 }
