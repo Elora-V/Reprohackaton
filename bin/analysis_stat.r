@@ -205,20 +205,43 @@ for (data in c(1,0)){
   
   #### PDF ----
   # title of the pdf with the MA plot
-  if (data == 0){
-    titre="MA-plot.pdf"
-  } else {
-    titre="MA-plot_article.pdf"
-  }
-  pdf(titre, width = 10, height = 7)
-  print(histCounts)
-  print(boxplotCounts)
-  print(heatmap(cor))
-  print(PCAplot)
-  print(hist(res$padj))
-  print(maplot)     
-  print(maplot_transl)    
-  dev.off() 
+  if (data == 0) {
+  titre = "MA-plot.pdf"
+} else {
+  titre = "MA-plot_article.pdf"
+}
+
+pdf(titre, width = 10, height = 7)
+
+pdf("histCounts.pdf", width = 10, height = 7)
+print(histCounts)
+dev.off()
+
+pdf("boxplotCounts.pdf", width = 10, height = 7)
+print(boxplotCounts)
+dev.off()
+
+pdf("heatmap.pdf", width = 10, height = 7)
+print(heatmap(cor))
+dev.off()
+
+pdf("PCAplot.pdf", width = 10, height = 7)
+print(PCAplot)
+dev.off()
+
+pdf("hist_padj.pdf", width = 10, height = 7)
+print(hist(res$padj))
+dev.off()
+
+pdf("maplot.pdf", width = 10, height = 7)
+print(maplot)
+dev.off()
+
+pdf("maplot_transl.pdf", width = 10, height = 7)
+print(maplot_transl)
+dev.off()
+
+dev.off()
   
 }
 
