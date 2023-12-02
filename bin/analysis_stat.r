@@ -213,32 +213,32 @@ for (data in c(1,0)){
 
 pdf(titre, width = 10, height = 7)
 
-pdf("histCounts.pdf", width = 10, height = 7)
 print(histCounts)
+pdf("histCounts.pdf", width = 10, height = 7)
 dev.off()
 
-pdf("boxplotCounts.pdf", width = 10, height = 7)
 print(boxplotCounts)
+pdf("boxplotCounts.pdf", width = 10, height = 7)
 dev.off()
 
-pdf("heatmap.pdf", width = 10, height = 7)
 print(heatmap(cor))
+pdf("heatmap.pdf", width = 10, height = 7)
 dev.off()
 
-pdf("PCAplot.pdf", width = 10, height = 7)
 print(PCAplot)
+pdf("PCAplot.pdf", width = 10, height = 7)
 dev.off()
 
-pdf("hist_padj.pdf", width = 10, height = 7)
 print(hist(res$padj))
+pdf("hist_padj.pdf", width = 10, height = 7)
 dev.off()
 
-pdf("maplot.pdf", width = 10, height = 7)
 print(maplot)
+pdf("maplot.pdf", width = 10, height = 7)
 dev.off()
 
-pdf("maplot_transl.pdf", width = 10, height = 7)
 print(maplot_transl)
+pdf("maplot_transl.pdf", width = 10, height = 7)
 dev.off()
 
 dev.off()
