@@ -240,8 +240,6 @@ dev.off()
 pdf("maplot_transl.pdf", width = 10, height = 7)
 print(maplot_transl)
 dev.off()
-
-dev.off()
   
 }
 
