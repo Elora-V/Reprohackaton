@@ -218,7 +218,13 @@ print(heatmap(cor))
 print(PCAplot)
 print(hist(res$padj))
 print(maplot)     
-print(maplot_transl)    
+print(maplot_transl)   
+
+pdf("Comparaison_resultats.pdf", width = 10, height = 7)
+print(PCAplot)
+print(heatmap(cor))
+print(plotfold)
+
 dev.off() 
   
 }
