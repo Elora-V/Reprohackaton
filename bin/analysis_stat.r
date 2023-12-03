@@ -331,6 +331,13 @@ summary(c(fullRES[,1]),fullRES[,2])
 #-5.04344 -0.94906 -0.04698  0.04562  0.92211  5.88998 
 print(paste("En moyenne diffère de ",round(moy,2)," en foldchange pour des valeurs de foldchange entre -5 et 5, avec pour moyenne 0.046."))
 
+orderfold=order(RES_A$log2FoldChange)
+dffold=data.frame(Res_Article= RES_A[orderfold,"log2FoldChange"],RES= RES[orderfold,"log2FoldChange"])
+plotfold=ggplot(dffold, aes(x=Res_Article,y=RES,color=abs(Res_Article-RES)))+
+  geom_point()+
+  geom_abline(intercept = 0, slope = 1, col = "green")
+
+
 # =>  "En moyenne diffère de  0.25  en foldchange pour des valeurs de foldchange entre -5 et 5, avec pour moyenne 0.046."
 
 # DEG
@@ -374,6 +381,7 @@ print(paste("Il y a ",CommunDEGTrans," genes  de traductions communs exprimés d
 pdf("Comparaison resultats", width = 10, height = 7)
 print(PCAplot)
 print(heatmap(cor))
+print(plotfold)
 dev.off()
 
 
