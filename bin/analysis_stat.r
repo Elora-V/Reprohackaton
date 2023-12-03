@@ -205,20 +205,21 @@ for (data in c(1,0)){
   
   #### PDF ----
   # title of the pdf with the MA plot
-  if (data == 0){
-    titre="MA-plot.pdf"
-  } else {
-    titre="MA-plot_article.pdf"
-  }
-  pdf(titre, width = 10, height = 7)
-  print(histCounts)
-  print(boxplotCounts)
-  print(heatmap(cor))
-  print(PCAplot)
-  print(hist(res$padj))
-  print(maplot)     
-  print(maplot_transl)    
-  dev.off() 
+  if (data == 0) {
+  titre = "MA-plot.pdf"
+} else {
+  titre = "MA-plot_article.pdf"
+}
+
+pdf(titre, width = 10, height = 7)
+print(histCounts)
+print(boxplotCounts)
+print(heatmap(cor))
+print(PCAplot)
+print(hist(res$padj))
+print(maplot)     
+print(maplot_transl)   
+dev.off() 
   
 }
 
@@ -292,7 +293,7 @@ print(paste("Il y a ",foldSimilaire," gènes qui ont leurs foldchanges différe 
 
 foldSimilaire=sum(abs(fullRES$fold1-fullRES$fold2)<= 0.2)
 print(paste("Il y a ",foldSimilaire," gènes qui ont leurs foldchanges différe au maximum de 0.2, entre les résultats de l'article et les nôtres parmi",dim(fullRES)[1]," gènes non NA"))
-"Il y a  2116  gènes qui ont leurs foldchanges différe au maximum de 0.2, 
+#"Il y a  2116  gènes qui ont leurs foldchanges différe au maximum de 0.2, 
 # entre les résultats de l'article et les nôtres parmi 2730  gènes non NA"
 
 moy=mean(abs(fullRES$fold1-fullRES$fold2) )
@@ -306,8 +307,6 @@ dffold=data.frame(Res_Article= RES_A[orderfold,"log2FoldChange"],RES= RES[orderf
 plotfold=ggplot(dffold, aes(x=Res_Article,y=RES,color=abs(Res_Article-RES)))+
   geom_point()+
   geom_abline(intercept = 0, slope = 1, col = "green")
-
-
 
 # =>  "En moyenne diffère de  0.25  en foldchange pour des valeurs de foldchange entre -5 et 5, avec pour moyenne 0.046."
 
@@ -339,8 +338,8 @@ DEGtrans=subset(REST,padj<0.05)
 DEGtrans_A=subset(REST_A,padj<0.05)
 print(paste("Il y a ", dim(DEGtrans)[1], " genes de traduction exprimés différentiellement dans nos données."))
 #"Il y a  57  genes de traduction exprimés différentiellement dans nos données."
-print(paste("Il y a ", dim(DEGtrans_A)[1], " genes de traduction exprimés différentiellement dans nos données."))
-# Il y a  53  genes de traduction exprimés différentiellement dans nos données."
+print(paste("Il y a ", dim(DEGtrans_A)[1], " genes de traduction exprimés différentiellement dans les données de l'article."))
+# Il y a  53  genes de traduction exprimés différentiellement dans les données de l'article."
 
 CommunDEGTrans=length(intersect(rownames(DEGtrans),rownames(DEGtrans_A)))
 print(paste("Il y a ",CommunDEGTrans," genes  de traductions communs exprimés différentiellement entre nos données et l'article."))
@@ -349,7 +348,7 @@ print(paste("Il y a ",CommunDEGTrans," genes  de traductions communs exprimés d
 
 
 # PDF ----
-pdf("Comparaison resultats", width = 10, height = 7)
+pdf("Comparaison_resultats.pdf", width = 10, height = 7)
 print(PCAplot)
 print(heatmap(cor))
 print(plotfold)

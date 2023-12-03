@@ -50,6 +50,7 @@ process analyse_stat {
         /* pdf figures for our data and the article ones */
         file("MA-plot.pdf")
         file("MA-plot_article.pdf")
+        file("Comparaison_resultats.pdf")
     publishDir path: "${params.results}/STATS", mode: 'copy'
     when:
         /* Executed when the counts.txt file doesn't exist (and not the help parameter) */
